@@ -2,43 +2,49 @@ import requests
 import pandas as pd
 import pickle
 import requests
-from bs4 import BeautifulSoup
 import json
 import time
 import debug as db
+import resource_paths as rp
+
+def vote_request(congress, year, limit=0, request_timer=0):
+    """Builds two roll call matrices for the passage
+    votes of the house and senate on the specified congress
+    and year."""
+
+    house_urls, senate_urls = rp.get_vote_urls(congress, year)
+
+    if db.none_check(house_urls, congress, year)\
+    or db.none_check(senate_urls, congress, year):return
+    
+    build_n_pack(house_urls, congress, year, limit, request_timer, "h_votes")
+    build_n_pack(senate_urls, congress, year, limit, request_timer, "s_votes")
+
+def build_n_pack(urls, congress, year, limit=0, request_timer=0, fn=""):
+    if limit > 0 and limit < len(urls):
+        urls = urls[:limit]
+    # setup rp.get_urls to return two url lists for house and senate
+    iddf = build_iddf(urls[0])
+
+    if db.none_check(iddf, congress, year):return
+
+    vote_df  = create_vote_df(urls, congress, year, request_timer)
+    vote_df = iddf.merge(vote_df, left_index=True, right_index=True)
+    h_filepath = rp.get_pickle_fp(congress, year, fn)
+    vote_df.to_pickle(h_filepath)
 
 
-def build_n_pack(congress, year, limit=0, request_timer=0):
-    """Build's a roll call matrix from the specified congress
-    in a given year. The indeces of the columns correspond to the
-    lawmaker's id. Other identifying information includes:
-        Name
-        Party
-        State
-    The rest of the columns are bills identified by "vote_id"
-    each field is a 0 for nay or present, a 1 for aye """
-
-    urls = get_urls(congress, year)
-    if db.none_check(urls, congress, year):return
-    urls = urls[:limit] if limit > 0 and limit < len(urls) else urls
-    # setup get_urls to return two url lists for house and senate
-    # separate the part bellow this to call the function twice
-    # and pickle two objects per call.
-    df = build_id_df(urls[0])
-    if db.none_check(df, congress, year):return
+def create_vote_df(urls, congress, year, request_timer=0):
+    """Creates vote matrix columns given the url"""
     column_list=[]
     for column in get_votes(urls):
         if column is None:continue
         if request_timer > 0:time.sleep(request_timer)
         column_list.append(column)
 
-    vote_df = pd.concat(column_list, axis=1)
-    df = df.merge(vote_df, left_index=True, right_index=True)
-    filepath = './votes-'+str(congress)+"-"+str(year)+".pkl"
-    df.to_pickle(filepath)
-    
+    return pd.concat(column_list, axis=1)
 
-def build_id_df(url):
+def build_iddf(url):
     """Builds the identifying information DataFrame
     this function is horrible"""
     req = requests.get(url)
@@ -49,7 +55,6 @@ def build_id_df(url):
 
     fields = ["display_name", "party", "state"]
     columns = [j_to_vseries(js, feature) for feature in fields]
-    
     return pd.concat(columns, axis=1)
 
 def get_votes(urls):
@@ -63,27 +68,33 @@ def get_votes(urls):
         yield j_to_vseries(json.loads(vreq.text))
 
 
-def get_urls(congress, year):
-    """Computes the url paths for the given congress and year."""
-    url = "https://www.govtrack.us/data/congress/"+str(congress)+"/votes/"+str(year)+"/"
-    r = requests.get(url)
-    if not db.good_request(r):return None
-
-    soup = BeautifulSoup(r.text, "html.parser")
-    titles = soup.select("a")
-    titles = [title.text for title in titles]
-    #Strip the parent directory
-    titles = titles[1:]
-    return [url+title+"data.json" for title in titles]
-
-
 def j_to_vseries(js, query=None):
     """Turns a json roll call page into a Pandas series"""
     vote_casted = {}
     if "votes" not in js:
         return None
+    if query is None:
+        if not right_votetype(js):
+            return None
+
     for votetype in js["votes"]:
         for vote in js["votes"][votetype]:
-            vote_casted[vote["id"]] = votetype if not query else vote[query]
-    name = js["vote_id"] if not query else query
+            if type(vote) != dict: continue
+            vote_casted[vote["id"]] = votetype_to_num(votetype) if not query else vote[query]
+    name = js["bill"]["type"]+str(js["bill"]["number"]) if not query else query
     return pd.Series(vote_casted, name=name)
+
+def right_votetype(js):
+    """Determines if a vote is a passage vote or not"""
+    if "bill" in js and js["category"] == "passage" and "amendment" not in js:
+        return True
+    else:
+        return False
+
+def votetype_to_num(votetype):
+    """Transform all yeas into ones and everything else to 0"""
+    if votetype[0] == 'Y' or votetype[0] == 'y' or votetype[0] == 'A' or votetype[0] == 'a':
+        return 1
+    else:
+        return 0
+
