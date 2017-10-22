@@ -16,7 +16,7 @@ def vote_request(congress, year, limit=0, request_timer=0):
 
     if db.none_check(house_urls, congress, year)\
     or db.none_check(senate_urls, congress, year):return
-    
+
     build_n_pack(house_urls, congress, year, limit, request_timer, "h_votes")
     build_n_pack(senate_urls, congress, year, limit, request_timer, "s_votes")
 
