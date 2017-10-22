@@ -5,6 +5,7 @@ import json
 import requests
 import pickle
 import pandas as pd
+import resource_paths as rp
 
 def lbl_bill_request(congress, year, limit=0, request_timer=0):
     """Builds a data frame whose index are bill codes, it has
@@ -22,6 +23,15 @@ def lbl_bill_request(congress, year, limit=0, request_timer=0):
     #separate the bill list
     #make requests to those bills and pickle em up in two dictionaries
 
-    
+def load_list(congress, year, typ):
+    with open(rp.get_bill_list(congress, year, typ), "rb") as f:
+            bill_list = pickle.load(f)
+
+    return bill_list.columns.values.tolist()
+
+def build_base_df(congress, year):
+    """builds the first column of the dataframe"""
+    s_list = load_list(congress, year, "h")
+    h_list = load_list(congress, year, "s")
 
 

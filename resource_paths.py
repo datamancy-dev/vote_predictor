@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 def get_pickle_fp(congress, year, typ):
     return typ + "-" + str(congress)+"-"+str(year)+".pkl"
 
+def get_bill_list(congress, year, typ):
+    return typ + "-" + str(congress) + "-" + str(year)
 
 def get_vote_urls(congress, year):
     """Computes the url paths for the given congress and year."""

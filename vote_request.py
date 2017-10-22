@@ -15,10 +15,11 @@ def vote_request(congress, year, limit=0, request_timer=0):
     house_urls, senate_urls = rp.get_vote_urls(congress, year)
 
     if db.none_check(house_urls, congress, year)\
-    or db.none_check(senate_urls, congress, year):return
+    or db.none_check(senate_urls, congress, year):
+        return
 
-    build_n_pack(house_urls, congress, year, limit, request_timer, "h_votes")
-    build_n_pack(senate_urls, congress, year, limit, request_timer, "s_votes")
+    build_n_pack(house_urls, congress, year, limit, request_timer, "h")
+    build_n_pack(senate_urls, congress, year, limit, request_timer, "s")
 
 def build_n_pack(urls, congress, year, limit=0, request_timer=0, fn=""):
     if limit > 0 and limit < len(urls):
@@ -26,13 +27,22 @@ def build_n_pack(urls, congress, year, limit=0, request_timer=0, fn=""):
     # setup rp.get_urls to return two url lists for house and senate
     iddf = build_iddf(urls[0])
 
-    if db.none_check(iddf, congress, year):return
+    if db.none_check(iddf, congress, year):
+        return
 
-    vote_df  = create_vote_df(urls, congress, year, request_timer)
+    vote_df = create_vote_df(urls, congress, year, request_timer)
     vote_df = iddf.merge(vote_df, left_index=True, right_index=True)
     h_filepath = rp.get_pickle_fp(congress, year, fn)
+    rp.create_bill_list(vote_df, fn, congress, year)
     vote_df.to_pickle(h_filepath)
 
+def create_bill_list(vote_df, fn, congress, year):
+    """Pickles a bill list to be used by the bill scraper"""
+    cols = vote_df.columns
+    cols = cols[3:]
+    name = rp.get_bill_list(congress, year, fn)
+    with open(name, "wb") as f:
+        pickle.dump(cols, f)
 
 def create_vote_df(urls, congress, year, request_timer=0):
     """Creates vote matrix columns given the url"""
