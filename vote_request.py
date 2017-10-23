@@ -6,6 +6,7 @@ import json
 import debug as db
 import resource_paths as rp
 
+
 def vote_request(congress, year, limit=0, request_timer=0):
     """Builds two roll call matrices for the passage
     votes of the house and senate on the specified congress

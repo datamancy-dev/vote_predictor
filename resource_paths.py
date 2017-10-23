@@ -6,8 +6,11 @@ import time
 from datetime import datetime as dt
 
 
-def get_pickle_fp(congress, year, typ):
-    return typ + "-" + str(congress)+"-"+str(year)+".pkl"
+def get_bill_pickle_fp(congress, year, typ):
+    return typ + "bill" +"-" + str(congress)+"-"+str(year)+".pkl"
+
+def get_vote_pickle_fp(congress, year, typ):
+    return typ + "vote" +"-" + str(congress)+"-"+str(year)+".pkl"
 
 def get_bill_list(congress, year, typ):
     return typ + "-" + str(congress) + "-" + str(year)+".pkl"
