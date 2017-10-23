@@ -8,7 +8,7 @@ import pandas as pd
 import resource_paths as rp
 
 
-def lbl_list_request(congress, year, request_timer):
+def lbl_list_request(congress, year, request_timer=0):
     pickle_df(congress, year, "h", request_timer)
     pickle_df(congress, year, "s", request_timer)
 
@@ -27,19 +27,19 @@ def pickle_df(congress, year, chamber, request_timer=0):
     df, js, txt = build_base_df(c_list, congress, year)
 
     subj_df = build_col_from_resource(c_list, js, "subjects_top_term", request_timer)
-    df.merge(subj_df, left_index=True, right_index=True)
+    df = df.merge(subj_df, left_index=True, right_index=True)
 
-    text_col = build_col_from_resource(clist, txt, "text", request_timer, txt=True)
+    text_col = build_col_from_resource(c_list, txt, "text", request_timer, txt=True)
     df[text_col.name] = text_col
 
-    df.to_pickle(get_bill_pickle_fp(congress, year, chamber))
+    df.to_pickle(rp.get_bill_pickle_fp(congress, year, chamber))
 
 
 def load_list(congress, year, typ):
     with open(rp.get_bill_list(congress, year, typ), "rb") as f:
             bill_list = pickle.load(f)
 
-    return bill_list.columns.values.tolist()
+    return bill_list.values.tolist()
 
 def build_base_df(c_list, congress, year):
     """builds the first column of the dataframe"""

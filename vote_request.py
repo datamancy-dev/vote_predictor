@@ -33,8 +33,8 @@ def build_n_pack(urls, congress, year, limit=0, request_timer=0, fn=""):
 
     vote_df = create_vote_df(urls, congress, year, request_timer)
     vote_df = iddf.merge(vote_df, left_index=True, right_index=True)
-    h_filepath = rp.get_pickle_fp(congress, year, fn)
-    rp.create_bill_list(vote_df, fn, congress, year)
+    h_filepath = rp.get_vote_pickle_fp(congress, year, fn)
+    create_bill_list(vote_df, fn, congress, year)
     vote_df.to_pickle(h_filepath)
 
 

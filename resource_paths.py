@@ -66,7 +66,7 @@ def get_text_urls(text_dirs):
         dir_names = extract_dir_names(text_dir)
         dates, key = extract_dates(text_dir)
         datesdir = dict(zip(dates, dir_names))
-        time.sleep(2)
+        #time.sleep(2)
         yield url + datesdir[key]
 
 
