@@ -7,9 +7,11 @@ import pickle
 import pandas as pd
 import resource_paths as rp
 
+
 def lbl_list_request(congress, year, request_timer):
     pickle_df(congress, year, "h", request_timer)
     pickle_df(congress, year, "s", request_timer)
+
 
 def pickle_df(congress, year, chamber, request_timer=0):
     """Builds a data frame whose index are bill codes, it has
@@ -20,14 +22,6 @@ def pickle_df(congress, year, chamber, request_timer=0):
           - subjects     : All of the subjects the bill is about
           - text         : The raw text of the bill
     """
-    #Get bill title dictionary from pickle file in directory
-    #Build a column with bill titles and bill names as its values
-    #Build a list of all of the links to the bills
-    #Build a list with all of the titles to the bills
-    #Zip em in a dictionary
-    #use the bill title dictionary from the beginning to prune and
-    #separate the bill list
-    #make requests to those bills and pickle em up in two dictionaries
     c_list = load_list(congress, year, chamber)
 
     df, js, txt = build_base_df(c_list, congress, year)
