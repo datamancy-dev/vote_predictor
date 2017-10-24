@@ -30,12 +30,13 @@ def get_bill_urls(congress, to_select):
     """Crawls the site getting the links to the files that matter
     Returns a list of the urls that matters"""
 
-    root_dir = "https://www.govtrack.us/data/congress/"+ str(congress)+"/bills/"
+    root_dir = "https://www.govtrack.us/data/congress/" + str(congress) + \
+               "/bills/"
     root = requests.get(root_dir)
 
     if not db.good_request(root):
         return None
-    
+
     sub_roots = extract_dir_names(root)
     sub_roots = [root_dir + s_root for s_root in sub_roots]
     all_bills = []
@@ -76,7 +77,7 @@ def extract_dates(r):
     pre = soup.find_all("pre")
     raw = pre.pop()
 
-    date_pattern = re.compile(r'[0-9][0-9]-[a-z A-Z]+-[0-9]{4}')
+    date_pattern = re.compile(r'[0-9][0-9]-[a-zA-Z]+-[0-9]{4}')
     list_of_dates = date_pattern.findall(raw.text)
     list_of_dates = [date for date in num_date(list_of_dates)]
 
