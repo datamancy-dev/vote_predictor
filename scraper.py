@@ -4,8 +4,7 @@ import subprocess as sp
 
 def run():
     """Runs things"""
-    command_args=[(109, [2005, 2006]), (110, [2007, 2008]), (111, [2009, 2010]),
-                  (112, [2011, 2012]), (113, [2013, 2014]), (114, [2015, 2016])]
+    command_args=[(110, [2008])]
 
     
     #The longest computation time per iteration for loop I've ever written

@@ -4,7 +4,17 @@ from bs4 import BeautifulSoup
 import re
 import time
 from datetime import datetime as dt
+import os
 
+
+DATA_FP = "./data"
+
+def get_all_dfs(query):
+    l = []
+    for docs in os.walk(DATA_FP):
+        r = [os.path.join(docs[0],name) for name in docs[2] if name[:len(query)]==query]
+        l += r
+    return l
 
 def get_bill_pickle_fp(congress, year, typ):
     return typ + "bill" +"-" + str(congress)+"-"+str(year)+".pkl"
