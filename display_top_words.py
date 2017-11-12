@@ -1,3 +1,4 @@
+"""Displays the top terms in the given LDA model"""
 from sys import argv
 import pickle
 import numpy as np
@@ -6,12 +7,16 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 name, n_top_words, lda_model, cvect = argv
 
+def main(n_words, lda_model, cvect):
+    """main"""
+    vocab, model = load_vocab_and_model(cvect, lda_model)
 
-#Placeholder so that cvect can exist
-class StemTokenizer(object):
-    def __init__(self):
-        pass
-def main():
+    topic_words = make_topic_word_dict(vocab, model, n_words)
+
+    print_topic_word_dict(topic_words)
+
+def load_vocab_and_model(cvect, lda_model):
+    """Self explanatory"""
     with open(cvect, "rb") as f:
         cvect = pickle.load(f)
 
@@ -20,19 +25,28 @@ def main():
     with open(lda_model, "rb") as f:
         model = pickle.load(f)
 
+    return vocab, model
 
+def make_topic_word_dict(vocab, model, n_words):
+    """Makes a maping of top terms per topic in an LDA model"""
     topic_words = {}
-
-
-
     for topic, comp in enumerate(model.components_):
-        word_idx = np.argsort(comp)[::-1][:int(n_top_words)]
+        word_idx = np.argsort(comp)[::-1][:n_words]
 
         topic_words[topic] = [vocab[i] for i in word_idx]
 
+    return topic_words
+
+def print_topic_word_dict(topic_words):
+    """Self explanatory"""
     for topic, words in topic_words.items():
         print('Topic: %d' % topic)
         print('%s' % '\n'.join(words))
 
+#Placeholder so that cvect can exist
+class StemTokenizer(object):
+    def __init__(self):
+        pass
+
 if __name__ == '__main__':
-    main()
+    main(n_top_words, lda_model, cvect)
