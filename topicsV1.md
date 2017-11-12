@@ -83,7 +83,7 @@ LDA topics v1.0
 ### Topic 26: Credit, Deposits, Appraisals(?)
 ----
 
-### Topic 27: Volunteers, Community service 
+### Topic 27: Volunteers, Community service
 ----
 
 ### Topic 28: Sexual and Domestic Violence, Human Trafficking

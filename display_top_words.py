@@ -11,24 +11,28 @@ name, n_top_words, lda_model, cvect = argv
 class StemTokenizer(object):
     def __init__(self):
         pass
+def main():
+    with open(cvect, "rb") as f:
+        cvect = pickle.load(f)
 
-with open(cvect, "rb") as f:
-    cvect = pickle.load(f)
+    vocab = cvect.get_feature_names()
 
-vocab = cvect.get_feature_names()
-
-with open(lda_model, "rb") as f:
-    model = pickle.load(f)
+    with open(lda_model, "rb") as f:
+        model = pickle.load(f)
 
 
-topic_words = {}
+    topic_words = {}
 
-for topic, comp in enumerate(model.components_):
-    word_idx = np.argsort(comp)[::-1][:n_top_words]
 
-    topic_words[topic] = [vocab[i] for i in word_idx]
 
-for topic, words in topic_words.items():
-    print('Topic: %d' % topic)
-    print('%s' % '\n'.join(words))
+    for topic, comp in enumerate(model.components_):
+        word_idx = np.argsort(comp)[::-1][:int(n_top_words)]
 
+        topic_words[topic] = [vocab[i] for i in word_idx]
+
+    for topic, words in topic_words.items():
+        print('Topic: %d' % topic)
+        print('%s' % '\n'.join(words))
+
+if __name__ == '__main__':
+    main()
