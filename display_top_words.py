@@ -40,7 +40,7 @@ def make_topic_word_dict(vocab, model, n_words):
 def print_topic_word_dict(topic_words):
     """Self explanatory"""
     for topic, words in topic_words.items():
-        print('Topic: %d' % topic)
+        print('\n\nTopic: %d \n' % topic)
         print('%s' % '\n'.join(words))
 
 #Placeholder so that cvect can exist
