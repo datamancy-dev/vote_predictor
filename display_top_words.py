@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
-name, n_top_words, lda_model, cvect = argv
+NAME, N_TOP_WORDS, LDA_MODEL, CVECT = ARGv
 
 def main(n_words, lda_model, cvect):
     """main"""
@@ -49,4 +49,4 @@ class StemTokenizer(object):
         pass
 
 if __name__ == '__main__':
-    main(n_top_words, lda_model, cvect)
+    main(N_TOP_WORDS, LDA_MODEL, CVECT)
