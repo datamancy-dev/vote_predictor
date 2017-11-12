@@ -49,4 +49,4 @@ class StemTokenizer(object):
         pass
 
 if __name__ == '__main__':
-    main(N_TOP_WORDS, LDA_MODEL, CVECT)
+    main(int(N_TOP_WORDS), LDA_MODEL, CVECT)
