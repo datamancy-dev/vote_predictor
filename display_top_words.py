@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
-NAME, N_TOP_WORDS, LDA_MODEL, CVECT = ARGv
+NAME, N_TOP_WORDS, LDA_MODEL, CVECT = argv
 
 def main(n_words, lda_model, cvect):
     """main"""
