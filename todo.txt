@@ -1,0 +1,18 @@
+To pipeline:
+New vote mining, model updating
+must setup mongodb to facilitate interoperability. I believe I want to separate
+storage from computing.
+Vote pipeline in a py file
+Lawmaker list pipeline
+  This could be a simple dictionary with lawmakers as keys and a value of a list
+  of length equals to the number of congresses I have and binary values that
+  indicate whether they are in that congress or not.
+
+  This list needs to be pipelined from the get go and will be the first step to
+  building the model.
+
+All bills per lawmaker
+
+Bills and topics
+
+

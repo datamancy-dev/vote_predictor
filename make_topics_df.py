@@ -14,6 +14,19 @@ class StemTokenizer(object):
     def __init__():
         pass
 
+def create_topics_df(bills, lda_out, out_name):
+    with open(bills, "rb") as f:
+        bills = pickle.load(f)
+
+    with open(lda_out, "rb") as f:
+        lda_out = pickle.load(f)
+
+    topic_names = ["Topic-" + str(X) for X in xrange(lda_out.shape[1])]
+
+    topic_df = pd.DataFrame(lda_out, index=bills.index, columns = topic_names)
+
+    with open(out_name, "wb") as f:
+        pickle.dump(topic_df, f)
 
 
 
