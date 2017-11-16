@@ -4,15 +4,8 @@ import re
 from sys import argv
 from sklearn.decomposition import LatentDirichletAllocation as LDA
 import pandas as pd
-import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer
 
-NAME, NUM_TOPICS, LDA_MODEL = argv
-
-#Just placeholder so that cvect can exist
-class StemTokenizer(object):
-    def __init__():
-        pass
+NAME, ALL_BILLS, LDA_MODEL, OUT_NAME = argv
 
 def create_topics_df(bills, lda_out, out_name):
     with open(bills, "rb") as f:
@@ -22,13 +15,14 @@ def create_topics_df(bills, lda_out, out_name):
         lda_out = pickle.load(f)
 
     topic_names = ["Topic-" + str(X) for X in xrange(lda_out.shape[1])]
-
     topic_df = pd.DataFrame(lda_out, index=bills.index, columns = topic_names)
+    years, house = extract_y_and_house(topic_df.index.values.tolist())
 
-    with open(out_name, "wb") as f:
+    topic_df["years"] = years
+    topic_df["house"] = house
+
+    with open("./"+out_name, "wb") as f:
         pickle.dump(topic_df, f)
-
-
 
 
 def extract_y_and_house(inds):
@@ -41,5 +35,4 @@ def extract_y_and_house(inds):
     return years, house
 
 if __name__ == '__main__':
-    y_and_h = extract_y_and_house()
-    
+    create_topics_df(ALL_BILLS, LDA_MODEL, OUT_NAME)
