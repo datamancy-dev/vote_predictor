@@ -1,3 +1,5 @@
+"""This file makes the vote dataframes as well as 
+the unique lawmakers dictionary """
 import re
 import pickle
 from sys import argv
@@ -39,8 +41,11 @@ def create_congress_dflst(linkslist, house_initial):
 
 def append_year(df, link, house_initial):
     find_year = re.compile(r"[0-9]{4}")
-    new_name = find_year.search(link).group(0) + house_initial + "-"
+    year = find_year.search(link).group(-1)
+    new_name = year + house_initial + "-"
     df = df.add_prefix(new_name)
+    #This is kinda yanky but the fastest solution I found
+    df["year"] = int(year)
 
     return df
 
@@ -57,6 +62,16 @@ def reload_without_dupes(df, fp):
     sp.call(["rm", fp])
 
     return df
+
+
+def unique_lawmakers(votes):
+    """Makes a set with all of the lawmakers' IDs"""
+    unique_l = defaultdict(set)
+
+    for df in votes:
+        for lawmaker in df.index.values.tolist():
+            unique_l[lawmaker].add(df["year"])
+    return unique_l
 
 
 if __name__ == '__main__':
