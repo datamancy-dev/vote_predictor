@@ -29,8 +29,8 @@ def extract_y_and_house(inds):
     years = []
     house = []
     for ind in inds:
-        years.append(int(inds[:4]))
-        house.append(inds[4])
+        years.append(int(ind[:4]))
+        house.append(ind[4])
 
     return years, house
 
