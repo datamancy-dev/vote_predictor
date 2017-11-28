@@ -11,12 +11,47 @@ def make_lawmakers_df(lawm_path, vote_resource, chamber):
     response_cols = build_response_cols(votes_p_congress, lawm_path)
 
     dataframes = build_variables(response_cols)
+    lawm_list = [lawm["name"] for lawm in response_cols]
+    for lawm in response_cols:
+        del_dict_elems(lawm, ["name"])
+
     series_response_cols = [pd.Series(response_col) for response_col in
-            response_cols]
+                            response_cols]
 
     dataframes = [df for df in combinedflist(dataframes, series_response_cols)]
 
+    dataframes = clean_dfs(dataframes)
+
     pack_resource(dataframes, "./"+chamber+"_modeldfs.pkl")
+    pack_resource(lawm_list, "./"+chamber+"_lawmakerstomodels.pkl")
+
+
+def dirty_dflist(dflist):
+    """Returns indeces to dirty dataframes"""
+    return [ind for ind, df in enumerate(dflist) if df.isnull().values.any()]
+
+
+def drop_nullsnshorts(df):
+    """Drops nulls, return none if the df is too small"""
+    df.dropna(inplace=True)
+    if df.shape[0] < df.shape[1]:
+        return None
+    else:
+        return df
+
+
+def clean_dfs(dflist):
+    """Some dfs have null values. All must also be integers"""
+    dirty = dirty_dflist(dflist)
+    for val in dirty:
+        dflist[val] = drop_nullsnshorts(dflist[val])
+    dflist = [df for df in dflist if df is not None]
+
+    for df in dflist:
+        df["response"] = df["response"].astype(int)
+
+    return dflist
+
 
 def combinedflist(dataframes, response_cols):
     """combines a list of dataframes and response columns"""
@@ -82,7 +117,14 @@ def congress_response_col(vote_df, lawm):
 
     congress_lawmaker_votes = vote_df.loc[lawm][:].to_dict()
 
-    congress_lawmaker_votes = del_pointone_col(congress_lawmaker_votes)
+    pointone = re.compile(r"\.1")
+    list_to_del = [val for val in congress_lawmaker_votes.keys() if
+                   len(pointone.findall(val)) > 0]
+
+    congress_lawmaker_votes = del_dict_elems(congress_lawmaker_votes,
+                                             list_to_del)
+
+    congress_lawmaker_votes["name"] = lawm
 
     del congress_lawmaker_votes[vote_df.columns.values.tolist()[0]]
     del congress_lawmaker_votes[vote_df.columns.values.tolist()[1]]
@@ -91,17 +133,13 @@ def congress_response_col(vote_df, lawm):
 
     return congress_lawmaker_votes
 
-def del_pointone_col(col):
+def del_dict_elems(col, list_to_del):
     """Done to delete the bills that were voted on twice."""
-    pointone = re.compile(r"\.1")
-    list_to_del = [val for val in col.keys() if len(pointone.findall(val)) > 0]
 
     for val in list_to_del:
         del col[val]
 
     return col
-
-
 
 
 def load_resource(file_path):
