@@ -25,9 +25,9 @@ def trainlogreg_n_score(dflist):
         logreg = lr(random_state=42, max_iter = 500)
         try:
             scores = cvalscore(logreg, X, y, cv=5, n_jobs=-1)
+            model_mean_scores.append(scores.mean())
         except:
-            pass
-        model_mean_scores.append(scores.mean())
+            model_mean_scores.append(None)
 
     return model_mean_scores
 

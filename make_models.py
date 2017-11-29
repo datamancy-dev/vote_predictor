@@ -20,7 +20,7 @@ def make_lawmakers_df(lawm_path, vote_resource, chamber):
 
     dataframes = [df for df in combinedflist(dataframes, series_response_cols)]
 
-    dataframes = clean_dfs(dataframes)
+    dataframes, lawm_list = clean_dfs(dataframes, lawm_list)
 
     pack_resource(dataframes, "./"+chamber+"_modeldfs.pkl")
     pack_resource(lawm_list, "./"+chamber+"_lawmakerstomodels.pkl")
@@ -40,17 +40,20 @@ def drop_nullsnshorts(df):
         return df
 
 
-def clean_dfs(dflist):
+def clean_dfs(dflist, lawmlist):
     """Some dfs have null values. All must also be integers"""
     dirty = dirty_dflist(dflist)
     for val in dirty:
         dflist[val] = drop_nullsnshorts(dflist[val])
+
+    lawmlist = [lawmlist[i] for i, x in enumerate(dflist) if x is not None]
     dflist = [df for df in dflist if df is not None]
+
 
     for df in dflist:
         df["response"] = df["response"].astype(int)
 
-    return dflist
+    return dflist, lawmlist
 
 
 def combinedflist(dataframes, response_cols):
