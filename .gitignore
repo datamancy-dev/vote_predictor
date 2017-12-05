@@ -4,3 +4,6 @@
 *.pkl
 *.csv
 *.ipynb
+!finaltopicsdf.pkl
+!hvotes_p_congress.pkl
+!svotes_p_congress.pkl
