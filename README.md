@@ -11,8 +11,9 @@ The model uses Latent Dirichlet Allocation (LDA) which describes the bills as a 
 ### Logistic Regression Results
 ----
 My results were measured with cross validated accuracy. These are the ranges of accuracy I got (histogram coming soon)
+
 |Chamber | Min | Max | Avg |
-|-|-|-|-|
+|------- | --- | --- | --- |
 |Senate | .46 | .97 | .8 |
 |House | .53 | .99 | .77 |
 
